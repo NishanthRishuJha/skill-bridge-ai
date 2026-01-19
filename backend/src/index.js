@@ -7,42 +7,62 @@ import morgan from "morgan";
 
 import authRoutes from "./routes/authRoutes.js";
 import internshipRoutes from "./routes/internshipRoutes.js";
-import aiRoutes from "./routes/aiRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 dotenv.config();
 
 const app = express();
 
-/* ===== Middleware ===== */
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
-}));
+/* =========================
+   ✅ CORS – SINGLE SOURCE
+========================= */
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL, // https://skill-bridge-ai-ebon.vercel.app
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.options("*", cors()); // handle preflight
+
+/* =========================
+   MIDDLEWARES
+========================= */
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-/* ===== Routes ===== */
+/* =========================
+   ROUTES
+========================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/internships", internshipRoutes);
-app.use("/api/ai", aiRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/ai", aiRoutes);
 
-/* ===== Health Check ===== */
+/* =========================
+   TEST ROUTE
+========================= */
 app.get("/", (req, res) => {
   res.json({ message: "SkillBridge AI Backend Running 🚀" });
 });
 
-/* ===== Server ===== */
+/* =========================
+   SERVER + DB
+========================= */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-/* ===== Database ===== */
 mongoose
   .connect(process.env.DB_URL)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB error:", err));
+  .then(() => {
+    console.log("MongoDB connected");
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
