@@ -15,18 +15,16 @@ dotenv.config();
 const app = express();
 
 /* =========================
-   ✅ CORS – SINGLE SOURCE
+   ✅ CORS (FIXED)
 ========================= */
 app.use(
   cors({
     origin: process.env.CLIENT_URL, // https://skill-bridge-ai-ebon.vercel.app
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.options("*", cors()); // handle preflight
 
 /* =========================
    MIDDLEWARES
@@ -44,7 +42,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/ai", aiRoutes);
 
 /* =========================
-   TEST ROUTE
+   HEALTH CHECK
 ========================= */
 app.get("/", (req, res) => {
   res.json({ message: "SkillBridge AI Backend Running 🚀" });
