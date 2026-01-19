@@ -2,14 +2,10 @@ import { useState } from "react";
 import axios from "axios";
 import "./Register.css";
 
-export default function Register() {
-  const [data, setData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+export default function Register(){
+  const [data,setData] = useState({name:"",email:"",password:""});
 
-  const submit = async (e) => {
+  const submit = async(e)=>{
     e.preventDefault();
 
     try {
@@ -19,36 +15,20 @@ export default function Register() {
       );
       alert("Registered successfully 🎉");
     } catch (err) {
-      console.error(err);
+      console.error(err.response?.data || err.message);
       alert("Registration failed");
     }
   };
 
-  return (
+  return(
     <div className="register-container">
       <div className="register-card">
         <h2>Create Account</h2>
 
         <form onSubmit={submit}>
-          <input
-            placeholder="Name"
-            onChange={(e) =>
-              setData({ ...data, name: e.target.value })
-            }
-          />
-          <input
-            placeholder="Email"
-            onChange={(e) =>
-              setData({ ...data, email: e.target.value })
-            }
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) =>
-              setData({ ...data, password: e.target.value })
-            }
-          />
+          <input placeholder="Name" onChange={e=>setData({...data,name:e.target.value})}/>
+          <input placeholder="Email" onChange={e=>setData({...data,email:e.target.value})}/>
+          <input type="password" placeholder="Password" onChange={e=>setData({...data,password:e.target.value})}/>
           <button>Register</button>
         </form>
       </div>
