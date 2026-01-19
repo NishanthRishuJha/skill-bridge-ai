@@ -20,10 +20,12 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",                 // local dev
-      process.env.CLIENT_URL                  // Vercel frontend
+      "http://localhost:5173", // local dev
+      "https://skill-bridge-ai-ebon.vercel.app" // vercel frontend
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
