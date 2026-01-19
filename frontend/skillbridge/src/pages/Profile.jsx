@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function Profile(){
-
+export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -13,49 +12,70 @@ export default function Profile(){
     education: "",
     experience: "",
     github: "",
-    linkedin: ""
+    linkedin: "",
   });
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/profile", {
-      headers:{ Authorization:`Bearer ${token}` }
-    }).then(res => {
-      setForm({
-        ...form,
-        ...res.data,
-        skills: res.data.skills?.join(", ") || ""
-      });
-      setLoading(false);
-    });
-  }, []);
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/api/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setForm({
+          skills: res.data.skills?.join(", ") || "",
+          profileSummary: res.data.profileSummary || "",
+          education: res.data.education || "",
+          experience: res.data.experience || "",
+          github: res.data.github || "",
+          linkedin: res.data.linkedin || "",
+        });
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [token]);
 
-  const handleChange = (field,value)=>{
-    setForm(prev=>({...prev, [field]:value}));
-  }
+  const handleChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const update = async(e)=>{
+  const update = async (e) => {
     e.preventDefault();
     setSaving(true);
 
-    await axios.put(
-      "http://localhost:5000/api/profile",
-      { ...form, skills: form.skills.split(",").map(s=>s.trim()) },
-      { headers:{ Authorization:`Bearer ${token}` }}
-    );
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/profile`,
+        {
+          ...form,
+          skills: form.skills.split(",").map((s) => s.trim()),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    setSaving(false);
-    setMessage("Profile updated successfully ✨");
-    setTimeout(()=>setMessage(""),3000);
+      setMessage("Profile updated successfully ✨");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage("Update failed ❌");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if(loading) return <p className="text-center mt-10">Loading profile...</p>;
+  if (loading)
+    return <p className="text-center mt-10">Loading profile...</p>;
 
   return (
     <div className="flex justify-center mt-10">
       <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-2xl">
-
         <h2 className="text-3xl font-bold mb-6 text-gray-800">
           Your Profile
         </h2>
@@ -67,14 +87,13 @@ export default function Profile(){
         )}
 
         <form className="space-y-5" onSubmit={update}>
-
           <div>
             <label className="font-semibold">Skills</label>
             <input
               className="w-full p-2 border rounded mt-1"
               value={form.skills}
               placeholder="React, JavaScript, HTML"
-              onChange={e=>handleChange("skills", e.target.value)}
+              onChange={(e) => handleChange("skills", e.target.value)}
             />
           </div>
 
@@ -84,8 +103,9 @@ export default function Profile(){
               className="w-full p-2 border rounded mt-1"
               rows="3"
               value={form.profileSummary}
-              placeholder="Tell recruiters about yourself..."
-              onChange={e=>handleChange("profileSummary", e.target.value)}
+              onChange={(e) =>
+                handleChange("profileSummary", e.target.value)
+              }
             />
           </div>
 
@@ -94,7 +114,7 @@ export default function Profile(){
             <input
               className="w-full p-2 border rounded mt-1"
               value={form.education}
-              onChange={e=>handleChange("education", e.target.value)}
+              onChange={(e) => handleChange("education", e.target.value)}
             />
           </div>
 
@@ -104,7 +124,7 @@ export default function Profile(){
               className="w-full p-2 border rounded mt-1"
               rows="3"
               value={form.experience}
-              onChange={e=>handleChange("experience", e.target.value)}
+              onChange={(e) => handleChange("experience", e.target.value)}
             />
           </div>
 
@@ -114,7 +134,7 @@ export default function Profile(){
               <input
                 className="w-full p-2 border rounded mt-1"
                 value={form.github}
-                onChange={e=>handleChange("github", e.target.value)}
+                onChange={(e) => handleChange("github", e.target.value)}
               />
             </div>
 
@@ -123,7 +143,7 @@ export default function Profile(){
               <input
                 className="w-full p-2 border rounded mt-1"
                 value={form.linkedin}
-                onChange={e=>handleChange("linkedin", e.target.value)}
+                onChange={(e) => handleChange("linkedin", e.target.value)}
               />
             </div>
           </div>
@@ -134,7 +154,6 @@ export default function Profile(){
           >
             {saving ? "Saving..." : "Save Profile"}
           </button>
-
         </form>
       </div>
     </div>
