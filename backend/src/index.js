@@ -5,8 +5,9 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import morgan from "morgan";
 
+// Routes
 import authRoutes from "./routes/authRoutes.js";
-import internshipRoutes from "./routes/internshipRoutes.js";
+import internshipRoute from "./routes/internshipRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 
@@ -14,9 +15,9 @@ dotenv.config();
 
 const app = express();
 
-/* ======================
-   CORS CONFIG (IMPORTANT)
-====================== */
+/* ============================
+   ✅ CORS CONFIG (FINAL FIX)
+============================ */
 const allowedOrigins = [
   "http://localhost:5173",
   "https://skill-bridge-ai-ebon.vercel.app"
@@ -24,51 +25,55 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      // allow requests with no origin (Postman, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
-// 👇 THIS LINE FIXES YOUR ISSUE
+// 🔥 REQUIRED for preflight
 app.options("*", cors());
 
-/* ======================
-   MIDDLEWARES
-====================== */
+/* ============================
+   Middlewares
+============================ */
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-/* ======================
-   ROUTES
-====================== */
+/* ============================
+   Routes
+============================ */
 app.use("/api/auth", authRoutes);
-app.use("/api/internships", internshipRoutes);
+app.use("/api/internships", internshipRoute);
 app.use("/api/profile", profileRoutes);
 app.use("/api/ai", aiRoutes);
 
-/* ======================
-   TEST ROUTE
-====================== */
+/* ============================
+   Test Route
+============================ */
 app.get("/", (req, res) => {
   res.json({ message: "SkillBridge AI Backend Running 🚀" });
 });
 
-/* ======================
-   DATABASE + SERVER
-====================== */
+/* ============================
+   Server + DB
+============================ */
 const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 mongoose
   .connect(process.env.DB_URL)
-  .then(() => {
-    console.log("MongoDB connected");
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection failed:", err);
-  });
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB error:", err));
