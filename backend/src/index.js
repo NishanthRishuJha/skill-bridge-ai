@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import cors from "cors";
 
 
 import authRoutes from "./routes/authRoutes.js";
@@ -29,6 +30,11 @@ app.use("/api/profile", profileRoutes);
 //app.use("/api/profile", profileRoutes);
 app.use("/api/ai", aiRoutes);
 
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 // test route
 app.get("/", (req, res) => {
   res.json({ message: "SkillBridge AI Backend Running 🚀" });
