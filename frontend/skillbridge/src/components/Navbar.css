@@ -22,4 +22,26 @@ body{
   color:#222;
   font-family: Arial, Helvetica, sans-serif;
 }
+.navbar {
+  padding: 10px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  margin-right: 15px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+/* 👇 Active link styling */
+.nav-link.active {
+  color: #00ffcc;
+  font-weight: bold;
+  font-size: 18px;
+  border-bottom: 2px solid #00ffcc;
+}
 

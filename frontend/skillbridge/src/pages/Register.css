@@ -36,6 +36,7 @@
   font-weight:600;
   border-radius:8px;
   cursor:pointer;
+  gap: 16px;
 }
 
 .register-card button:hover{
