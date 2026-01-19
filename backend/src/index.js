@@ -14,35 +14,35 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS (VERY IMPORTANT)
+/* ===== Middleware ===== */
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true
 }));
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-// Routes
+/* ===== Routes ===== */
 app.use("/api/auth", authRoutes);
 app.use("/api/internships", internshipRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/profile", profileRoutes);
 
-// Health check
+/* ===== Health Check ===== */
 app.get("/", (req, res) => {
   res.json({ message: "SkillBridge AI Backend Running 🚀" });
 });
 
-// ✅ START SERVER FIRST
+/* ===== Server ===== */
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// ✅ THEN CONNECT DB
+/* ===== Database ===== */
 mongoose
   .connect(process.env.DB_URL)
   .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("MongoDB error:", err));
+  .catch((err) => console.error("MongoDB error:", err));
